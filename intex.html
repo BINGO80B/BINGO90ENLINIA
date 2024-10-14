@@ -3,81 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BINGO 90 BALOTAS</title>
+    <title>Bingo Online Complejo - 90 Balotas</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="c">
-        <div id="authScreen" class="d">
-            <h1>Bienvenido a BINGO 90 BALOTAS</h1>
-            <div id="loginForm">
-                <input type="text" id="usernameInput" placeholder="Nombre de usuario" required>
-                <button id="loginButton">Entrar al Juego</button>
+    <div class="container">
+        <div id="buy-tickets-screen" class="screen">
+            <h1>Comprar Tickets de Bingo</h1>
+            <div id="countdown" class="countdown">Tiempo para el sorteo: 02:00</div>
+            <div class="info-panel">
+                <div id="tickets-sold">Tickets vendidos: 0</div>
+                <div id="ticket-price">Precio del ticket: $200</div>
+                <div id="total-pot">Bote total: $0</div>
+                <div id="first-line-prize">Premio 1ª línea: $0</div>
+                <div id="second-line-prize">Premio 2ª línea: $0</div>
+                <div id="bingo-prize">Premio Bingo: $0</div>
             </div>
+            <div id="credits">Créditos: $<span id="credit-amount">2000</span></div>
+            <div id="tickets-container"></div>
+            <button id="buy-selected-tickets" class="buy-selected-btn">Comprar Tickets Seleccionados</button>
         </div>
-        <div id="gameScreen" class="d x">
-            <h1>BINGO 90 BALOTAS</h1>
-            <div id="playerInfo"></div>
-            <button id="logoutButton">Cerrar Sesión</button>
-            <div class="t">
-                <button class="b a" data-tab="buy">Comprar</button>
-                <button class="b" data-tab="draw">Sorteo</button>
-            </div>
-            <div id="buyTab" class="n">
-                <div class="o">
-                    <button id="cB">💳 Créditos: $<span id="cA">0</span></button>
-                    <select id="tP">
-                        <option value="200">$200</option>
-                    </select>
-                </div>
-                <div id="ticketContainer"></div>
-                <button id="generateTickets" class="e">Generar Nuevos Tickets</button>
-                <button id="buySelectedTickets" class="e" disabled>Comprar Tickets Seleccionados</button>
-            </div>
-            <div id="drawTab" class="n x">
-                <button id="sB" class="e">Iniciar Sorteo</button>
-                <div id="dR" class="x">
-                    <div id="dN"></div>
-                    <div id="tD"></div>
-                </div>
-                <div id="wI" class="x"></div>
-            </div>
-        </div>
-    </div>
-    <div id="cD" class="l">
-        <div class="m">
-            <h2>Gestión de Créditos</h2>
-            <button id="loadCreditsBtn">Cargar Créditos con Contraseña</button>
-            <button id="loadCreditsCodeBtn">Cargar Créditos con Código</button>
-            <button id="withdrawCreditsBtn">Retirar Créditos</button>
-            <div id="loadCreditsForm" class="x">
-                <input type="password" id="loadPassword" placeholder="Contraseña">
-                <input type="number" id="loadAmount" placeholder="Monto a cargar" min="1">
-                <button id="confirmLoadCredits">Confirmar Carga</button>
-            </div>
-            <div id="loadCreditsCodeForm" class="x">
-                <input type="text" id="loadCode" placeholder="Código de carga (formato: XXXXX00000)" maxlength="10">
-                <button id="confirmLoadCreditsCode">Confirmar Carga con Código</button>
-            </div>
-            <div id="withdrawCreditsForm" class="x">
-                <input type="number" id="withdrawAmount" placeholder="Monto a retirar" min="1">
-                <button id="confirmWithdraw">Confirmar Retiro</button>
-            </div>
-            <button id="clB">Cerrar</button>
-        </div>
-    </div>
-    <div id="receiptScreen" class="l">
-        <div class="m">
-            <h2>Recibo de Retiro</h2>
-            <div id="receiptContent"></div>
-            <button id="closeReceipt">Cerrar Recibo</button>
-        </div>
-    </div>
 
-    <audio id="cashRegisterSound" src="https://assets.mixkit.co/active_storage/sfx/140/140-preview.mp3"></audio>
-    <audio id="ticketBuySound" src="https://assets.mixkit.co/active_storage/sfx/140/140-preview.mp3"></audio>
-    <audio id="ballsSound" src="https://assets.mixkit.co/active_storage/sfx/181/181-preview.mp3"></audio>
-
+        <div id="draw-screen" class="screen">
+            <h1>Bingo Online Complejo - 90 Balotas</h1>
+            <div class="info-panel">
+                <div id="draw-first-line-prize">Premio 1ª línea: $0</div>
+                <div id="draw-second-line-prize">Premio 2ª línea: $0</div>
+                <div id="draw-bingo-prize">Premio Bingo: $0</div>
+            </div>
+            <div id="current-ball" class="current-ball">
+                <span id="ball-number">--</span>
+            </div>
+            <div id="drawn-balls" class="drawn-balls"></div>
+            <div id="player-tickets" class="player-tickets"></div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
