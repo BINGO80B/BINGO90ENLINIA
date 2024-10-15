@@ -30,7 +30,6 @@ let credits = 2000;
 let selectedTickets = new Set();
 let playerTickets = [];
 let autoTickets = [];
-let targetTicketSales;
 let drawIntervalId;
 let firstLineWon = false;
 let secondLineWon = false;
@@ -62,11 +61,9 @@ function updateCountdown() {
 }
 
 function simulateTicketSales() {
-    if (ticketsSold < targetTicketSales) {
-        ticketsSold++;
-        updatePrizes();
-        updateDisplay();
-    }
+    ticketsSold++;
+    updatePrizes();
+    updateDisplay();
 }
 
 function endTicketSales() {
@@ -77,12 +74,16 @@ function endTicketSales() {
 }
 
 function showEndOfSalesMessage() {
-    const messageElement = document.createElement('div');
-    messageElement.textContent = "El tiempo de compra ha terminado";
-    messageElement.style.color = "red";
-    messageElement.style.fontWeight = "bold";
-    messageElement.style.marginTop = "10px";
-    buyTicketsScreen.appendChild(messageElement);
+    const existingMessage = document.querySelector('.end-of-sales-message');
+    if (!existingMessage) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = "El tiempo de compra ha terminado";
+        messageElement.style.color = "red";
+        messageElement.style.fontWeight = "bold";
+        messageElement.style.marginTop = "10px";
+        messageElement.classList.add('end-of-sales-message');
+        countdownElement.insertAdjacentElement('afterend', messageElement);
+    }
 }
 
 function updatePrizes() {
@@ -110,17 +111,9 @@ function startGame() {
 }
 
 function startTicketSales() {
-    targetTicketSales = Math.floor(Math.random() * (100 - 80 + 1)) + 80; // Número aleatorio entre 80 y 100
-    generateAutoTickets(targetTicketSales);
     intervalId = setInterval(updateCountdown, 1000);
     buySelectedTicketsBtn.disabled = false;
     ticketSalesEnded = false;
-}
-
-function generateAutoTickets(count) {
-    for (let i = 0; i < count; i++) {
-        autoTickets.push(createTicketGrid());
-    }
 }
 
 function resetGame() {
@@ -144,6 +137,22 @@ function resetGame() {
     secondLineWon = false;
     bingoWon = false;
     ticketSalesEnded = false;
+    
+    const buyTicketsButton = drawScreen.querySelector('button');
+    if (buyTicketsButton) {
+        buyTicketsButton.remove();
+    }
+    
+    const endOfSalesMessage = document.querySelector('.end-of-sales-message');
+    if (endOfSalesMessage) {
+        endOfSalesMessage.remove();
+    }
+    
+    const winnerMessage = document.querySelector('.winner-message');
+    if (winnerMessage) {
+        winnerMessage.remove();
+    }
+    
     updateDisplay();
     countdownElement.textContent = 'Tiempo para el sorteo: 02:00';
     createTickets();
@@ -363,9 +372,9 @@ function markPlayerTickets(number) {
 
 function updateTicketColors() {
     const tickets = playerTicketsContainer.querySelectorAll('.player-ticket');
+    
     tickets.forEach(ticket => {
         const rows = [
-            
             Array.from(ticket.querySelectorAll('.ticket-number')).slice(0, 9),
             Array.from(ticket.querySelectorAll('.ticket-number')).slice(9, 18),
             Array.from(ticket.querySelectorAll('.ticket-number')).slice(18, 27)
@@ -407,6 +416,7 @@ function reorderTickets() {
         const colorOrder = {'#FFCCCB': 0, '#FFFACD': 1, '#90EE90': 2, '': 3};
         return colorOrder[a.style.backgroundColor] - colorOrder[b.style.backgroundColor];
     });
+    playerTicketsContainer.innerHTML = '';
     tickets.forEach(ticket => playerTicketsContainer.appendChild(ticket));
 }
 
@@ -503,35 +513,77 @@ function showWinnerAlert(prizeType, ticketId, prize) {
     clearInterval(drawIntervalId);
     const winnerID = Math.floor(Math.random() * 90000) + 10000;
 
-    const alertElement = document.createElement('div');
-    alertElement.classList.add('winner-alert');
-    alertElement.innerHTML = `
-        <h2>¡${prizeType}!</h2>
+    if (ticketId.startsWith('Jugador')) {
+        // Es el jugador que compra los tickets
+        const alertElement = document.createElement('div');
+        alertElement.classList.add('winner-alert');
+        alertElement.innerHTML = `
+            <h2>¡${prizeType}!</h2>
+            <p>Ticket ganador ID: ${ticketId}</p>
+            <p>Jugador ID: ${winnerID}</p>
+            <p>Premio: $${prize.toFixed(2)}</p>
+        `;
+
+        document.body.appendChild(alertElement);
+
+        credits += prize;
+        updateDisplay();
+
+        const playerAlert = document.createElement('div');
+        playerAlert.classList.add('player-alert');
+        playerAlert.textContent = `¡Felicidades! Has ganado $${prize.toFixed(2)} en ${prizeType}. Tus créditos han sido actualizados.`;
+        document.body.appendChild(playerAlert);
+
+        setTimeout(() => {
+            alertElement.remove();
+            playerAlert.remove();
+            resumeGame();
+        }, 6000);
+    } else {
+        // Es otro jugador
+        showWinnerMessage(prizeType, ticketId, winnerID, prize);
+        setTimeout(resumeGame, 6000);
+    }
+}
+
+function showWinnerMessage(prizeType, ticketId, winnerID, prize) {
+    const existingMessage = document.querySelector('.winner-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('winner-message');
+    messageElement.innerHTML = `
+        <h3>¡${prizeType}!</h3>
         <p>Ticket ganador ID: ${ticketId}</p>
         <p>Jugador ID: ${winnerID}</p>
         <p>Premio: $${prize.toFixed(2)}</p>
     `;
 
-    document.body.appendChild(alertElement);
+    const insertAfter = document.querySelector('#drawn-balls');
+    insertAfter.parentNode.insertBefore(messageElement, insertAfter.nextSibling);
+}
 
-    setTimeout(() => {
-        alertElement.remove();
-        if (!bingoWon) {
-            drawIntervalId = setInterval(drawBall, 1500);
-        } else {
-            enableBuyTicketsButton();
-        }
-    }, 6000);
+function resumeGame() {
+    if (!bingoWon) {
+        drawIntervalId = setInterval(drawBall, 1500);
+    } else {
+        enableBuyTicketsButton();
+    }
 }
 
 function enableBuyTicketsButton() {
-    const buyTicketsButton = document.createElement('button');
-    buyTicketsButton.textContent = 'Comprar Tickets';
-    buyTicketsButton.addEventListener('click', () => {
-        resetGame();
-        showBuyTicketsScreen();
-    });
-    drawScreen.appendChild(buyTicketsButton);
+    const existingButton = drawScreen.querySelector('button');
+    if (!existingButton) {
+        const buyTicketsButton = document.createElement('button');
+        buyTicketsButton.textContent = 'Comprar Tickets';
+        buyTicketsButton.addEventListener('click', () => {
+            resetGame();
+            showBuyTicketsScreen();
+        });
+        drawScreen.appendChild(buyTicketsButton);
+    }
 }
 
 createTickets();
